@@ -1,0 +1,30 @@
+name: Refresh Keshet 12 stream URL
+
+on:
+  schedule:
+    # רץ כל 15 דקות
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}   # מאפשר הרצה ידנית מה-Actions tab לבדיקה
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chrome for Puppeteer
+        run: npx puppeteer browsers install chrome
+
+      - name: Fetch fresh Keshet 12 URL and update Worker
+        env:
+          WORKER_UPDATE_URL: ${{ secrets.WORKER_UPDATE_URL }}
+          UPDATE_SECRET: ${{ secrets.UPDATE_SECRET }}
+        run: node fetch-keshet12.js
